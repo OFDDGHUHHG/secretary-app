@@ -73,6 +73,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           "microphonePermission": `秘书语音APP需要访问麦克风进行语音备忘录制。`
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#6366f1",
+          "sounds": []
+        }
       ]
     ],
     "experiments": {

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Audio } from 'expo-av';
+import * as Notifications from 'expo-notifications';
 import { Screen } from '@/components/Screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +14,7 @@ interface Message {
   text: string;
   audioUri?: string;
   timestamp: Date;
+  hasReminder?: boolean;
 }
 
 export default function AssistantPage() {
@@ -28,13 +30,20 @@ export default function AssistantPage() {
   const recordingRef = useRef<Audio.Recording | null>(null);
   const soundRef = useRef<Audio.Sound | null>(null);
 
-  // Request permission on mount
+  // Request permissions on mount
   useEffect(() => {
     (async () => {
-      const { status } = await Audio.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-      if (status !== 'granted') {
+      // Request audio permission
+      const { status: audioStatus } = await Audio.requestPermissionsAsync();
+      setHasPermission(audioStatus === 'granted');
+      if (audioStatus !== 'granted') {
         Alert.alert('权限提示', '需要麦克风权限才能使用语音功能');
+      }
+      
+      // Request notification permission
+      const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+      if (notifStatus !== 'granted') {
+        console.log('通知权限未授权');
       }
     })();
 
@@ -119,6 +128,38 @@ export default function AssistantPage() {
       const data = await result.json();
 
       if (data.success) {
+        // Check if reminder was set
+        const hasReminder = /提醒|记住了/i.test(data.aiResponse);
+        
+        // Schedule local notification if reminder was set
+        if (hasReminder && data.memo) {
+          try {
+            const { status } = await Notifications.getPermissionsAsync();
+            if (status === 'granted') {
+              // Get reminder time from response
+              const reminderTime = data.memo.reminder_time;
+              if (reminderTime) {
+                const rt = new Date(reminderTime);
+                if (rt > new Date()) {
+                  await Notifications.scheduleNotificationAsync({
+                    content: {
+                      title: '小秘提醒',
+                      body: data.memo.content,
+                      sound: true,
+                    },
+                    trigger: {
+                      type: Notifications.SchedulableTriggerInputTypes.DATE,
+                      date: rt,
+                    },
+                  });
+                }
+              }
+            }
+          } catch (notifError) {
+            console.error('设置通知失败:', notifError);
+          }
+        }
+
         // Add user message
         const userMsg: Message = {
           id: Date.now().toString(),
@@ -135,6 +176,7 @@ export default function AssistantPage() {
           text: data.aiResponse,
           audioUri: data.audioUri,
           timestamp: new Date(),
+          hasReminder,
         };
         setMessages(prev => [...prev, assistantMsg]);
 
