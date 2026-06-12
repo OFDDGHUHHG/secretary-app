@@ -1,0 +1,31 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: |
+          cd client
+          npm install
+          
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
+      - name: Build Android APK (Preview)
+        run: |
+          cd client
+          eas build --platform android --profile preview --non-interactive
+        env:
+          EAS_BUILD_CONTEXT: ${{ vars.EAS_BUILD_CONTEXT }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
