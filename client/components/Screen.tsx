@@ -314,4 +314,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Screen = withUniwind(RawScreen);
+export const Screen = withUniwind(RawScreen) as React.ComponentType<ScreenProps>;

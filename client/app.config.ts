@@ -23,11 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": `com.anonymous.x${projectId || '0'}`,
-      "notification": {
-        "icon": "./assets/images/notification-icon.png",
-        "color": "#4F46E5"
-      }
+      "package": `com.anonymous.x${projectId || '0'}`
     },
     "web": {
       "bundler": "metro",
