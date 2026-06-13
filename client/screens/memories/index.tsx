@@ -7,7 +7,7 @@ import { useFocusEffect } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import * as Sharing from 'expo-sharing';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'https://witty-bikes-relax.loca.lt';
+const API_BASE_URL = 'https://api-bdeggdpius.cn-hangzhou.fcapp.run';
 
 interface Memo {
   id: number;

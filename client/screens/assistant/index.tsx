@@ -6,7 +6,7 @@ import { Screen } from '@/components/Screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'https://witty-bikes-relax.loca.lt';
+const API_BASE_URL = 'https://api-bdeggdpius.cn-hangzhou.fcapp.run';
 
 interface Message {
   id: string;
